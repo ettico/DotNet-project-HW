@@ -1,11 +1,12 @@
 ﻿using CarsVolunteer.core.Repositories;
+using CarsVolunteer.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using שב_4.Controllers.properties;
 
 namespace CarsVolunteer.Data.Repositories
 {
@@ -18,59 +19,49 @@ namespace CarsVolunteer.Data.Repositories
             _dataContext = dataContext;
         }
         //שליפת רשימת לקוחות
-        public List<Customer> GetListOfCustomer()
+        public async Task<IEnumerable<Customer>> GetListOfCustomerAsync()
         {
-            return _dataContext.customers.ToList();
+            return await _dataContext.customers.Include(c=>c.Volun).ToListAsync();
         }
         //שליפת לקוח לפי ID
-        public Customer GetCustomerById(int id)
+        public async Task<Customer> GetCustomerByIdAsync(int id)
         {
-            return _dataContext.customers.ToList().Find(x=> x.castId == id);    
+            var customer= await _dataContext.customers.FirstOrDefaultAsync(x=> x.castId == id);
+            if (customer == null)
+            {
+                throw new ArgumentException($"Application with id {id} was not found.");
+            }
+            return customer;
         }
         //הוספת לקוח
-        public bool AddCustomer(Customer customer)
+        public async Task<Customer> AddCustomerAsync(Customer customer)
         {
-            //for (int i = 0; i < dataContext.customers.Count(); i++)
-            //{
-            //    if (GetCustomerById(customer.Id) == null)
-            //        return false;
-            //}
+            
             _dataContext.customers.Add(customer);
-            _dataContext.SaveChanges();
-            return true;
+            await _dataContext.SaveChangesAsync();
+            return customer;
         }
 
 
-        public bool DeleteCustomer(int id)
+        public async Task<Customer> DeleteCustomerAsync(int id)
         {
-            _dataContext.customers.Remove(GetCustomerById(id));
-            _dataContext.SaveChanges();
-            return true;
+          var customer= await _dataContext.customers.FirstOrDefaultAsync(x => x.castId == id);
+            if (customer == null)
+            {
+                throw new ArgumentException($"Application with id {id} was not found.");
+            }
+            _dataContext.customers.Remove(customer);
+            await _dataContext.SaveChangesAsync();
+            return customer;
         }
 
         //עדכון לקוח
-        public bool UpdateCustomer(int id, Customer customer)
+        public async Task<Customer> UpdateCustomerAsync(int id, Customer customer)
         {
-            DeleteCustomer(id);
-            AddCustomer(customer);
-            _dataContext.SaveChanges();
-            return true;
-            /*if (_dataContext.customers == null)
-                return false;
-            for (int i = 0; i < _dataContext.customers.Count(); i++)
-            {
-                if (_dataContext.customers.ToList()[i].Id == id)
-                {
-                    _dataContext.customers.ToList()[i].Id = customer.Id;
-                    _dataContext.customers.ToList()[i].Name = customer.Name;
-                    _dataContext.customers.ToList()[i].Address = customer.Address;
-                    _dataContext.customers.ToList()[i].Email = customer.Email;
-                    _dataContext.customers.ToList()[i].Phone = customer.Phone;
-                    _dataContext.customers.ToList()[i].Destination = customer.Destination;
-                    return true;
-                }
-            }
-            return false;*/
+          await  DeleteCustomerAsync(id);
+          await  AddCustomerAsync(customer);
+          await _dataContext.SaveChangesAsync();
+            return customer;
         }
     }
 }

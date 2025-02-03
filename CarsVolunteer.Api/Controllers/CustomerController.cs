@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using CarsVolunteer.core.servies;
-using שב_4.Controllers.properties;
+using CarsVolunteer.Api.Models;
+using CarsVolunteer.Core.Entities;
+using CarsVolunteer.Core.Service;
+using AutoMapper;
+using CarsVolunteer.Core.DTOs;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CarsVolunteer.Api.Controllers
@@ -10,43 +13,52 @@ namespace CarsVolunteer.Api.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerServies _customerService;
-        public CustomerController(ICustomerServies customerService)
+        private readonly IMapper _mapper;
+        public CustomerController(ICustomerServies customerService,IMapper mapper)
         {
             _customerService = customerService;
+            _mapper = mapper;
         }
         // GET: api/<CustomerController>
         [HttpGet]
-        public IEnumerable<Customer> Get()
+        public async Task<ActionResult> Get()
         {
-            return _customerService.GetListOfCustomer();
+            var list =await _customerService.GetListOfCustomerAsync();
+            var custDTO = _mapper.Map<IEnumerable<CustomerDTO>>(list);
+            return Ok(custDTO);
         }
 
         // GET api/<CustomerController>/5
         [HttpGet("{id}")]
-        public ActionResult<Customer> Get(int id)
+        public async Task<ActionResult<Customer>> Get(int id)
         {
-            return _customerService.GetCustomerById(id);
+            var cust =await _customerService.GetCustomerByIdAsync(id);
+            var custDTO = _mapper.Map<CustomerDTO>(cust);
+            return Ok(custDTO);
         }
 
         // POST api/<CustomerController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] Customer c)
+        public async Task<ActionResult<Customer>> Post([FromBody] CustomerPostModel c)
         {
-            return _customerService.AddCustomer(c);
+            var customer=new Customer { castName=c.castName,castAddress=c.castAddress, castPhone=c.castPhone,castEmail=c.castEmail,VolunteerId=c.VolunteerId};
+            return await _customerService.AddCustomerAsync(customer);
         }
 
         // PUT api/<CustomerController>/5
         [HttpPut("{id}")]
-        public bool Put(int id, [FromBody] Customer c)
+        public async Task<ActionResult<Customer>> Put(int id, [FromBody] CustomerPostModel c)
         {
-            return _customerService.UpdateCustomer(id, c);
+            var customer = new Customer { castName = c.castName, castAddress = c.castAddress, castPhone = c.castPhone, castEmail = c.castEmail, VolunteerId = c.VolunteerId };
+
+            return await _customerService.UpdateCustomerAsync(id, customer);
         }
 
         // DELETE api/<CustomerController>/5
         [HttpDelete("{id}")]
-        public ActionResult<bool> Delete(int id)
+        public async Task<ActionResult<Customer>> Delete(int id)
         {
-            return _customerService.DeleteCustomer(id);
+            return await _customerService.DeleteCustomerAsync(id);
         }
     }
 }

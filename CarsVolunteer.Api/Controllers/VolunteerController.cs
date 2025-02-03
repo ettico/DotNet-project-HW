@@ -1,6 +1,9 @@
-﻿using CarsVolunteer.core.servies;
+﻿using AutoMapper;
+using CarsVolunteer.Api.Models;
+using CarsVolunteer.Core.DTOs;
+using CarsVolunteer.Core.Entities;
+using CarsVolunteer.Core.Service;
 using Microsoft.AspNetCore.Mvc;
-using שב_4.Controllers.properties;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,43 +14,53 @@ namespace Project.Controllers
     public class VolunteerController : ControllerBase
     {
         private readonly IVolunteerServies _volunteerServies;
-        public VolunteerController(IVolunteerServies volunteerServies)
+        private readonly IMapper _mapper;
+        public VolunteerController(IVolunteerServies volunteerServies,IMapper mapper)
         {
             _volunteerServies=volunteerServies;
+            _mapper=mapper;
         }
         // GET: api/<Volunteer>
         [HttpGet]
-        public IEnumerable<Volunteer> Get()
+        public async Task<ActionResult> Get()
         {
-            return _volunteerServies.GetListOfVolunteer();
+            var list =await _volunteerServies.GetListOfVolunteerAsync();
+            var volDTO = _mapper.Map<IEnumerable<VolunteerDTO>>(list);
+            return Ok(volDTO);
         }
 
         // GET api/<Volunteer>/5
         [HttpGet("{id}")]
-        public Volunteer Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            return _volunteerServies.GetVolunteerById(id);
+            var vol=await _volunteerServies.GetVolunteerByIdAsync(id);
+            var volDTO = _mapper.Map<VolunteerDTO>(vol);
+
+            return Ok(volDTO);
         }
 
         // POST api/<Volunteer>
         [HttpPost]
-        public bool  Post([FromBody] Volunteer volunteer)
+        public async Task<ActionResult<Volunteer>> Post([FromBody] VolunteerPostModel volunteer)
         {
-             return _volunteerServies.AddVolunteer(volunteer);
+            var vol=new Volunteer { volName=volunteer.volName,volDomain=volunteer.volDomain,volPhone=volunteer.volPhone,volStatus=volunteer.volStatus};
+             return await _volunteerServies.AddVolunteerAsync(vol);
         }
 
         // PUT api/<Volunteer>/5
         [HttpPut("{id}")]
-        public bool  Put(int id, [FromBody] Volunteer volunteer)
+        public async Task<ActionResult<Volunteer>> Put(int id, [FromBody] VolunteerPostModel volunteer)
         {
-           return _volunteerServies.UpdateVolunteer(volunteer.volId,volunteer);
+            var vol = new Volunteer { volName = volunteer.volName, volDomain = volunteer.volDomain, volPhone = volunteer.volPhone, volStatus = volunteer.volStatus };
+
+            return await _volunteerServies.UpdateVolunteerAsync(id,vol);
         }
 
         // DELETE api/<Volunteer>/5
         [HttpDelete("{id}")]
-        public bool Delete(int id)
+        public async Task<ActionResult<Volunteer>> Delete(int id)
         {
-            return _volunteerServies.DeleteVolunteer(id);
+            return await _volunteerServies.DeleteVolunteerAsync(id);
         }
     }
 }

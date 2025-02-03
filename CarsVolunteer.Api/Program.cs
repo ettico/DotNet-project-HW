@@ -1,5 +1,6 @@
 using CarsVolunteer.core.Repositories;
-using CarsVolunteer.core.servies;
+using CarsVolunteer.Core;
+using CarsVolunteer.Core.Service;
 using CarsVolunteer.Data;
 using CarsVolunteer.Data.Repositories;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -25,10 +26,14 @@ builder.Services.AddScoped<IApplicationServies, ApplicationServies>();
 
 builder.Services.AddDbContext<DataContext>();
 
+
 builder.Services.AddCors(opt => opt.AddPolicy("MyPolicy", policy =>
 {
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 }));
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 
 var app = builder.Build();
 

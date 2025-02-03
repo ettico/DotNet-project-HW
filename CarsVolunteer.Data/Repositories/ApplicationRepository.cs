@@ -1,11 +1,11 @@
 ﻿using CarsVolunteer.core.Repositories;
+using CarsVolunteer.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using שב_4.Controllers.properties;
 
 namespace CarsVolunteer.Data.Repositories
 {
@@ -17,41 +17,49 @@ namespace CarsVolunteer.Data.Repositories
         {
             _dataContext = dataContext;
         }
-        public bool AddApplication(Application Application)
+        public async Task<Application> AddApplicationAsync(Application Application)
         {
             _dataContext.Applications.Add(Application);
-            _dataContext.SaveChanges();
-            return true;
+           await _dataContext.SaveChangesAsync();
+            return Application;
         }
 
-        public bool DeleteApplication(int id)
+        public async Task<Application> DeleteApplicationAsync(int id)
         {
-            var application = GetApplicationById(id);
+            var application =await _dataContext.Applications.FirstOrDefaultAsync(x=>x.appId==id);
             if (application == null)
             {
                 throw new ArgumentException($"Application with id {id} was not found.");
             }
-            _dataContext.Applications.Remove(GetApplicationById(id));
-            _dataContext.SaveChanges();
-            return true;
+            _dataContext.Applications.Remove(application);
+            await _dataContext.SaveChangesAsync();
+            return application;
         }
 
-        public List<Application> GetListOfApplication()
+        public async Task<IEnumerable<Application>> GetListOfApplicationAsync()
         {
-            return _dataContext.Applications.ToList();//.Include(u => u.customer)
+            return await _dataContext.Applications.Include(u => u.Customer).ToListAsync();
         }
 
-        public Application GetApplicationById(int id)
+        public async Task<Application> GetApplicationByIdAsync(int id)
         {
-            return _dataContext.Applications.ToList().Find(x => x.appId == id);
+            var application = await _dataContext.Applications.FirstOrDefaultAsync(x => x.appId == id);
+            if (application == null)
+            {
+                throw new ArgumentException($"Application with id {id} was not found.");
+            }
+            return application;
         }
 
-        public bool UpdateApplication(int id, Application travel)
+       
+
+        public async Task<Application> UpdateApplicationAsync(int id, Application application)
         {
-            DeleteApplication(id);
-            AddApplication(travel);
-            _dataContext.SaveChanges();
-            return true;
+            await DeleteApplicationAsync(id);
+            await _dataContext.SaveChangesAsync();
+            return  await AddApplicationAsync(application);
+
+
         }
     }
 }

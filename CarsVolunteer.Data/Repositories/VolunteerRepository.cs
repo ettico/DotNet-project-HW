@@ -1,10 +1,11 @@
 ﻿using CarsVolunteer.core.Repositories;
+using CarsVolunteer.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using שב_4.Controllers.properties;
 
 namespace CarsVolunteer.Data.Repositories
 {
@@ -15,36 +16,46 @@ namespace CarsVolunteer.Data.Repositories
         {
             _dataContext = dataContext;
         }
-        public List<Volunteer> GetListOfVolunteer()
+        public async Task<IEnumerable<Volunteer>> GetListOfVolunteerAsync()
         {
-            return _dataContext.volunteers.ToList();
+            return await _dataContext.volunteers.ToListAsync();
         }
 
-        public Volunteer GetVolunteerById(int id)
+        public async Task<Volunteer> GetVolunteerByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var vol = await _dataContext.volunteers.FirstOrDefaultAsync(x => x.volId == id);
+            if (vol == null)
+            {
+                throw new ArgumentException($"Application with id {id} was not found.");
+            }
+            return vol;
         }
 
-        public bool DeleteVolunteer(int id)
+        public async Task<Volunteer> DeleteVolunteerAsync(int id)
         {
-            _dataContext.volunteers.Remove(GetVolunteerById(id));
-            _dataContext.SaveChanges();
-            return true;
+            var vol = await _dataContext.volunteers.FirstOrDefaultAsync(x => x.volId == id);
+            if (vol == null)
+            {
+                throw new ArgumentException($"Application with id {id} was not found.");
+            }
+            _dataContext.volunteers.Remove(vol);
+            await _dataContext.SaveChangesAsync();
+            return vol;
         }
 
-        public bool AddVolunteer(Volunteer volunteer)
+        //הוספת לקוח
+        public async Task<Volunteer> AddVolunteerAsync(Volunteer volunteer)
         {
             _dataContext.volunteers.Add(volunteer);
-            _dataContext.SaveChanges();
-            return true;
+            await _dataContext.SaveChangesAsync();
+            return volunteer;
         }
-
-        public bool UpdateVolunteer(int id, Volunteer volunteer)
+        public async Task<Volunteer> UpdateVolunteerAsync(int id, Volunteer volunteer)
         {
-            DeleteVolunteer(id);
-            AddVolunteer(volunteer);
-            _dataContext.SaveChanges();
-            return true;
+           await DeleteVolunteerAsync(id);
+           await AddVolunteerAsync(volunteer);
+           await _dataContext.SaveChangesAsync();
+            return volunteer;
         }
     }
 }

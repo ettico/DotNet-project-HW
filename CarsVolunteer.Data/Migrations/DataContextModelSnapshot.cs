@@ -30,6 +30,9 @@ namespace CarsVolunteer.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("appId"), 1L, 1);
 
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Domain")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -38,21 +41,12 @@ namespace CarsVolunteer.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("custID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("customercastId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("dateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("volId")
-                        .HasColumnType("int");
-
                     b.HasKey("appId");
 
-                    b.HasIndex("customercastId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Applications");
                 });
@@ -64,6 +58,9 @@ namespace CarsVolunteer.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("castId"), 1L, 1);
+
+                    b.Property<int>("VolunteerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("castAddress")
                         .IsRequired()
@@ -83,6 +80,8 @@ namespace CarsVolunteer.Data.Migrations
 
                     b.HasKey("castId");
 
+                    b.HasIndex("VolunteerId");
+
                     b.ToTable("customers");
                 });
 
@@ -93,9 +92,6 @@ namespace CarsVolunteer.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("volId"), 1L, 1);
-
-                    b.Property<int>("carNum")
-                        .HasColumnType("int");
 
                     b.Property<string>("volDomain")
                         .IsRequired()
@@ -119,13 +115,34 @@ namespace CarsVolunteer.Data.Migrations
 
             modelBuilder.Entity("שב_4.Controllers.properties.Application", b =>
                 {
-                    b.HasOne("שב_4.Controllers.properties.Customer", "customer")
-                        .WithMany()
-                        .HasForeignKey("customercastId")
+                    b.HasOne("שב_4.Controllers.properties.Customer", "Customer")
+                        .WithMany("applications")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("customer");
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Customer", b =>
+                {
+                    b.HasOne("שב_4.Controllers.properties.Volunteer", "Volun")
+                        .WithMany("customers")
+                        .HasForeignKey("VolunteerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Volun");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Customer", b =>
+                {
+                    b.Navigation("applications");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Volunteer", b =>
+                {
+                    b.Navigation("customers");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarsVolunteer.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241205203956_createDB")]
-    partial class createDB
+    [Migration("20250201202111_one-to-meny")]
+    partial class onetomeny
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,9 @@ namespace CarsVolunteer.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("appId"), 1L, 1);
 
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Domain")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -40,16 +43,12 @@ namespace CarsVolunteer.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("custID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("dateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("volId")
-                        .HasColumnType("int");
-
                     b.HasKey("appId");
+
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Applications");
                 });
@@ -61,6 +60,9 @@ namespace CarsVolunteer.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("castId"), 1L, 1);
+
+                    b.Property<int>("VolunteerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("castAddress")
                         .IsRequired()
@@ -80,6 +82,8 @@ namespace CarsVolunteer.Data.Migrations
 
                     b.HasKey("castId");
 
+                    b.HasIndex("VolunteerId");
+
                     b.ToTable("customers");
                 });
 
@@ -90,9 +94,6 @@ namespace CarsVolunteer.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("volId"), 1L, 1);
-
-                    b.Property<int>("carNum")
-                        .HasColumnType("int");
 
                     b.Property<string>("volDomain")
                         .IsRequired()
@@ -112,6 +113,38 @@ namespace CarsVolunteer.Data.Migrations
                     b.HasKey("volId");
 
                     b.ToTable("volunteers");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Application", b =>
+                {
+                    b.HasOne("שב_4.Controllers.properties.Customer", "Customer")
+                        .WithMany("applications")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Customer", b =>
+                {
+                    b.HasOne("שב_4.Controllers.properties.Volunteer", "Volun")
+                        .WithMany("customers")
+                        .HasForeignKey("VolunteerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Volun");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Customer", b =>
+                {
+                    b.Navigation("applications");
+                });
+
+            modelBuilder.Entity("שב_4.Controllers.properties.Volunteer", b =>
+                {
+                    b.Navigation("customers");
                 });
 #pragma warning restore 612, 618
         }

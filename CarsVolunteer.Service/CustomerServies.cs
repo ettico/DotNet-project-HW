@@ -1,6 +1,6 @@
-﻿using CarsVolunteer.core.servies;
-using CarsVolunteer.core.Repositories;
-using שב_4.Controllers.properties;
+﻿using CarsVolunteer.core.Repositories;
+using CarsVolunteer.Core.Entities;
+using CarsVolunteer.Core.Service;
 
 namespace Project.Servies
 {
@@ -11,25 +11,25 @@ namespace Project.Servies
         {
             _CustomerRepository = CustomerRepository;
         }
-        public List<Customer> GetListOfCustomer()
+        public async Task<IEnumerable<Customer>> GetListOfCustomerAsync()
         {
-            return _CustomerRepository.GetListOfCustomer();
+            return await _CustomerRepository.GetListOfCustomerAsync();
         }
-        public Customer GetCustomerById(int id)
+        public async Task<Customer> GetCustomerByIdAsync(int id)
         {
-            return _CustomerRepository.GetCustomerById(id);
+            return await _CustomerRepository.GetCustomerByIdAsync(id);
         }
-        public bool AddCustomer(Customer customer)
+        public async Task<Customer> AddCustomerAsync(Customer customer)
         {
-            return _CustomerRepository.AddCustomer(customer);
+            return await _CustomerRepository.AddCustomerAsync(customer);
         }
-        public bool DeleteCustomer(int id)
+        public async Task<Customer> DeleteCustomerAsync(int id)
         {
-            return _CustomerRepository.DeleteCustomer(id);
+            return await _CustomerRepository.DeleteCustomerAsync(id);
         }
-        public bool UpdateCustomer(int id, Customer customer)
+        public async Task<Customer> UpdateCustomerAsync(int id, Customer customer)
         {
-            return _CustomerRepository.UpdateCustomer(id, customer);
+            return await _CustomerRepository.UpdateCustomerAsync(id, customer);
         }
     }
 }

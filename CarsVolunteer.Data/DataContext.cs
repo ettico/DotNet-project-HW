@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using שב_4.Controllers.properties;
+﻿using CarsVolunteer.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarsVolunteer.Data
 {

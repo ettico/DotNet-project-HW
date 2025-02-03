@@ -1,6 +1,6 @@
 ﻿using CarsVolunteer.core.Repositories;
-using CarsVolunteer.core.servies;
-using שב_4.Controllers.properties;
+using CarsVolunteer.Core.Entities;
+using CarsVolunteer.Core.Service;
 
 namespace Project.Servies
 {
@@ -8,31 +8,31 @@ namespace Project.Servies
     {
         readonly private IApplicationRepository _ApplicationRepository;
 
-        public bool AddApplication(Application application)
-        {
-            _ApplicationRepository.AddApplication(application);
-            return true;
-        }
-
-        public bool DeleteApplication(int id)
-        {
-            _ApplicationRepository.DeleteApplication(id);
-            return true;
-        }
-
         public ApplicationServies(IApplicationRepository applicationRepository)
         {
             _ApplicationRepository = applicationRepository ?? throw new ArgumentNullException(nameof(applicationRepository));
         }
-        public List<Application> GetListOfApplication()
+        public async Task<Application> AddApplicationAsync(Application application)
         {
-          return _ApplicationRepository.GetListOfApplication();
+           await _ApplicationRepository.AddApplicationAsync(application);
+            return application;
+        }
+
+        public async Task<Application> DeleteApplicationAsync(int id)
+        {
+           return  await _ApplicationRepository.DeleteApplicationAsync(id);
+        }
+
+       
+        public async Task<IEnumerable<Application>> GetListOfApplicationAsync()
+        {
+          return await _ApplicationRepository.GetListOfApplicationAsync();
              
         }
 
-        public Application GetApplicationById(int id)
+        public async Task<Application> GetApplicationByIdAsync(int id)
         {
-           return _ApplicationRepository.GetApplicationById(id);
+           return await _ApplicationRepository.GetApplicationByIdAsync(id);
            //var application = _dataContext.Applications.FirstOrDefault(a => a.Id == id);
            //if (application == null)
            //{
@@ -41,9 +41,12 @@ namespace Project.Servies
            //return application;
         }
 
-        public bool UpdateApplication(int id, Application application)
+      
+
+        public async Task<Application> UpdateApplicationAsync(int id, Application application)
         {
-            return _ApplicationRepository.UpdateApplication(id, application);  
+            return await _ApplicationRepository.UpdateApplicationAsync(id, application);
+
         }
     }
 }

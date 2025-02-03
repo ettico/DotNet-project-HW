@@ -1,9 +1,9 @@
 ﻿
 using CarsVolunteer.core.Repositories;
-using CarsVolunteer.core.servies;
+using CarsVolunteer.Core.Entities;
+using CarsVolunteer.Core.Service;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
-using שב_4.Controllers.properties;
 
 namespace Project.Servies
 {
@@ -14,31 +14,29 @@ namespace Project.Servies
         {
             _volunteerRepository=volunteerRepository;
         }
-        public bool AddVolunteer(Volunteer volunteer)
+        public async Task<Volunteer> AddVolunteerAsync(Volunteer volunteer)
         {
-            _volunteerRepository.AddVolunteer(volunteer);
-            return true;
+           return await _volunteerRepository.AddVolunteerAsync(volunteer);
         }
 
-        public bool DeleteVolunteer(int id)
+        public async Task<Volunteer> DeleteVolunteerAsync(int id)
         {
-            _volunteerRepository.DeleteVolunteer(id);
-            return true;
+          return  await _volunteerRepository.DeleteVolunteerAsync(id);
         }
 
-        public List<Volunteer> GetListOfVolunteer()
+        public async Task<IEnumerable<Volunteer>> GetListOfVolunteerAsync()
         {
-            return _volunteerRepository.GetListOfVolunteer();
+            return await _volunteerRepository.GetListOfVolunteerAsync();
         }
 
-        public Volunteer GetVolunteerById(int id)
+        public async Task<Volunteer> GetVolunteerByIdAsync(int id)
         {
-            return _volunteerRepository.GetVolunteerById(id);
+            return await _volunteerRepository.GetVolunteerByIdAsync(id);
         }
 
-        public bool UpdateVolunteer(int id, Volunteer volunteer)
+        public async Task<Volunteer> UpdateVolunteerAsync(int id, Volunteer volunteer)
         {
-            return _volunteerRepository.UpdateVolunteer(id, volunteer);
+            return await _volunteerRepository.UpdateVolunteerAsync(id, volunteer);
         }
     }
 }
